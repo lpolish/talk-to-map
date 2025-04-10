@@ -1,22 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EarthAI Development Environment
+
+## Prerequisites
+
+- Node.js 18+ and npm
+- Docker and Docker Compose
 
 ## Getting Started
 
-First, run the development server:
-
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Start the PostgreSQL database:
+```bash
+docker-compose up -d
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The PostgreSQL database will be available at:
+- Host: localhost
+- Port: 5432
+- Database: earthai_db
+- Username: earthai_user
+- Password: dev_password_123 (change this in production)
+
+To verify the database is running:
+```bash
+docker-compose ps
+```
+
+To view database logs:
+```bash
+docker-compose logs -f db
+```
+
+To stop the database:
+```bash
+docker-compose down
+```
+
+To stop the database and remove all data:
+```bash
+docker-compose down -v
+```
+
+## Development
+
+Run the development server:
+```bash
+npm run dev
+```
+
+The application will be available at [http://localhost:3000](http://localhost:3000).
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
