@@ -24,6 +24,56 @@ Built with Next.js, React, and Leaflet, EarthAI provides a modern, responsive in
 - Node.js 18+ and npm
 - Docker and Docker Compose
 
+## Environment Variables
+
+The application requires several environment variables to function properly. Create a `.env` file in the root directory with the following variables:
+
+```bash
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=earthai_db
+DB_USER=earthai_user
+DB_PASSWORD=your_secure_password_here
+
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Application Configuration
+NODE_ENV=development
+
+# Database URL (used in Docker)
+DATABASE_URL=postgresql://earthai_user:your_secure_password_here@db:5432/earthai_db
+
+# PostgreSQL Configuration (for Docker)
+POSTGRES_DB=earthai_db
+POSTGRES_USER=earthai_user
+POSTGRES_PASSWORD=your_secure_password_here
+```
+
+### Environment Variables Description
+
+- **Database Configuration**
+  - `DB_HOST`: Database host address (default: localhost)
+  - `DB_PORT`: Database port (default: 5432)
+  - `DB_NAME`: Database name (default: earthai_db)
+  - `DB_USER`: Database username (default: earthai_user)
+  - `DB_PASSWORD`: Database password (default: dev_password_123)
+
+- **OpenAI Configuration**
+  - `OPENAI_API_KEY`: Your OpenAI API key for the chat functionality
+
+- **Application Configuration**
+  - `NODE_ENV`: Application environment (development/production)
+
+- **Docker Database Configuration**
+  - `DATABASE_URL`: Full PostgreSQL connection URL for Docker
+  - `POSTGRES_DB`: PostgreSQL database name
+  - `POSTGRES_USER`: PostgreSQL username
+  - `POSTGRES_PASSWORD`: PostgreSQL password
+
+> Note: The Docker environment variables are automatically set in the `docker-compose.yml` file. You only need to modify them if you want to use different values.
+
 ## Docker Setup
 
 The application is containerized using Docker and Docker Compose. The setup includes:
