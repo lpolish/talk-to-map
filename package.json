@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint .",
     "init-db": "ts-node --transpile-only ./scripts/init-db.ts",
-    "setup": "npm install && docker-compose up -d && npm run init-db"
+    "setup": "npm install && docker-compose up -d && npm run init-db",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@types/leaflet": "^1.9.17",
