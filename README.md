@@ -1,6 +1,23 @@
-# EarthAI Development Environment
+# EarthAI
 
-## Prerequisites
+EarthAI is an interactive satellite map application with an integrated AI chat interface. It allows users to explore locations around the world while having natural conversations with an AI assistant about the places they're viewing.
+
+## 🌍 About the Project
+
+EarthAI combines interactive mapping technology with AI-powered chat to create an engaging exploration experience. The platform features:
+
+- Interactive satellite and standard map views
+- AI-powered chat assistant that understands your location context
+- Real-time location information and coordinates
+- Multiple map types (Standard, Satellite, Relief, Dark)
+- Smooth navigation and zoom controls
+- Persistent chat history and session management
+
+Built with Next.js, React, and Leaflet, EarthAI provides a modern, responsive interface for exploring the world through maps and conversation.
+
+## 🚀 Getting Started
+
+### Prerequisites
 
 - Node.js 18+ and npm
 - Docker and Docker Compose
