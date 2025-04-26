@@ -20,16 +20,16 @@ export const MapTypeSelector: React.FC<MapTypeSelectorProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`fixed top-14 left-0 right-0 z-30 flex justify-center items-center pointer-events-none ${className}`}>
-      <div className="flex bg-white/85 backdrop-blur shadow-lg rounded-md pointer-events-auto overflow-hidden border border-gray-200">
+    <div className={`fixed top-4 z-50 left-1/2 transform -translate-x-1/2 ${className}`}>
+      <div className="flex bg-gray-800 shadow-md">
         {(Object.keys(mapTypeLabels) as MapType[]).map((type) => (
           <button
             key={type}
             onClick={() => onTypeChange(type)}
-            className={`px-4 py-2 text-sm transition-all duration-200 border-r last:border-r-0 border-gray-200 ${
+            className={`px-4 py-2 text-sm ${
               selectedType === type
-                ? 'bg-blue-600 text-white font-medium shadow-inner'
-                : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
+                ? 'bg-blue-600 text-white'
+                : 'text-white hover:bg-gray-700'
             }`}
             aria-label={`Switch to ${mapTypeLabels[type]} map view`}
             aria-pressed={selectedType === type}

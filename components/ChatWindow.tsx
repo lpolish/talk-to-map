@@ -11,10 +11,9 @@ const CHAT_HISTORY_KEY = 'earthai_chat_history';
 const ChatWindow: React.FC<ChatWindowProps> = ({
   currentMapState,
   onNavigate,
-  initialX = 20,
-  initialY = 20,
   initialWidth = 320,
-  initialHeight = 480
+  initialHeight = 480,
+  positionClassName = "left-5 top-20"
 }) => {
   // Initialize with welcome message or retrieve from localStorage
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -49,11 +48,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [position, setPosition] = useState({ x: initialX, y: initialY });
+  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [wasDragged, setWasDragged] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const chatInputRef = useRef<HTMLTextAreaElement>(null);
+  const chatInputRef = useRef<HTMLInputElement>(null);
   const chatWindowRef = useRef<HTMLDivElement>(null);
   const dragStartPos = useRef({ x: 0, y: 0 });
   const dragStartOffset = useRef({ x: 0, y: 0 });
@@ -95,8 +95,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       y: e.clientY 
     };
     
-    // Store the initial window position
-    dragStartOffset.current = { ...position };
+    // Get current position on first drag
+    if (!wasDragged) {
+      const rect = chatWindowRef.current?.getBoundingClientRect();
+      if (rect) {
+        // Initialize position to current element position on first drag
+        setPosition({ x: rect.left, y: rect.top });
+        dragStartOffset.current = { x: rect.left, y: rect.top };
+      }
+    } else {
+      dragStartOffset.current = { ...position };
+    }
     
     // Add event listeners
     document.addEventListener('mousemove', handleMouseMove);
@@ -115,6 +124,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     
     // Set the new position
     setPosition({ x: newX, y: newY });
+    setWasDragged(true);
   };
 
   const handleMouseUp = () => {
@@ -218,12 +228,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   };
 
   // Handle text input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
   };
 
   // Handle key press in the input field
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -246,109 +256,95 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
   // Colors based on theme
   const colors = {
-    bg: isDarkMode ? 'rgba(24, 24, 27, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+    bg: isDarkMode ? 'rgba(24, 24, 27, 0.9)' : 'rgba(255, 255, 255, 0.9)',
     text: isDarkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
     textSecondary: isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
     border: isDarkMode ? 'rgba(63, 63, 70, 0.4)' : 'rgba(229, 231, 235, 0.8)',
-    headerBg: isDarkMode ? 'rgba(49, 46, 129, 0.9)' : 'rgba(30, 64, 175, 0.9)',
+    headerBg: isDarkMode ? 'rgba(44, 46, 102, 0.95)' : 'rgba(39, 76, 155, 0.95)',
     inputBg: isDarkMode ? 'rgba(39, 39, 42, 0.7)' : 'rgba(255, 255, 255, 0.7)',
     inputBorder: isDarkMode ? 'rgba(63, 63, 70, 0.5)' : 'rgba(0, 0, 0, 0.1)',
-    primary: isDarkMode ? 'rgba(79, 70, 229, 0.9)' : 'rgba(37, 99, 235, 0.9)',
-    userMessageBg: isDarkMode ? 'rgba(79, 70, 229, 0.8)' : 'rgba(37, 99, 235, 0.8)',
+    primary: isDarkMode ? 'rgba(59, 73, 174, 1)' : 'rgba(37, 99, 235, 1)',
+    userMessageBg: isDarkMode ? 'rgba(59, 73, 174, 0.9)' : 'rgba(37, 99, 235, 0.9)',
     assistantMessageBg: isDarkMode ? 'rgba(39, 39, 42, 0.6)' : 'rgba(243, 244, 246, 0.8)'
   };
 
   return (
     <div 
       ref={chatWindowRef}
-      className="absolute"
+      className={`absolute ${!wasDragged ? positionClassName : ''}`}
       style={{
-        transform: `translate(${position.x}px, ${position.y}px)`,
+        transform: wasDragged ? `translate(${position.x}px, ${position.y}px)` : '',
         cursor: isDragging ? 'grabbing' : 'default',
         zIndex: 1000,
         width: initialWidth + 'px',
         maxWidth: '90vw'
       }}
     >
-      <motion.div
+      <div
         className="chat-window"
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
         style={{
           width: '100%',
           height: isMinimized ? 'auto' : `${initialHeight}px`,
           maxHeight: '80vh',
-          borderRadius: '12px',
+          borderRadius: '4px',
           overflow: 'hidden',
-          boxShadow: isDarkMode 
-            ? '0 8px 32px rgba(0, 0, 0, 0.4)' 
-            : '0 8px 32px rgba(0, 0, 0, 0.15)',
+          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
           backgroundColor: colors.bg,
-          backdropFilter: 'blur(10px)',
           border: `1px solid ${colors.border}`,
           display: 'flex',
-          flexDirection: 'column',
-          transition: 'all 0.3s ease'
+          flexDirection: 'column'
         }}
       >
         {/* Chat Header */}
         <div 
           className="chat-header"
           style={{
-            padding: '12px 16px',
+            padding: '10px 16px',
             borderBottom: `1px solid ${colors.border}`,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             backgroundColor: colors.headerBg,
             color: 'white',
-            cursor: isDragging ? 'grabbing' : 'grab'
+            cursor: isDragging ? 'grabbing' : 'grab',
+            userSelect: 'none'
           }}
           onMouseDown={handleMouseDown}
+          title="Drag to move"
         >
           <div className="flex items-center gap-2">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="white" strokeWidth="2"/>
-              <path d="M15 9.5C15 11.9853 12 16 12 16C12 16 9 11.9853 9 9.5C9 7.01472 10.3431 5 12 5C13.6569 5 15 7.01472 15 9.5Z" stroke="white" strokeWidth="2"/>
-              <path d="M12 10C12.5523 10 13 9.55228 13 9C13 8.44772 12.5523 8 12 8C11.4477 8 11 8.44772 11 9C11 9.55228 11.4477 10 12 10Z" fill="white"/>
-            </svg>
             <span style={{ fontWeight: '600', fontSize: '14px' }}>EarthAI Assistant</span>
+            <span className="text-xs opacity-70">Drag</span>
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '6px' }}>
             <button 
               onClick={clearChat}
               style={{
-                background: 'none',
+                background: 'rgba(255,255,255,0.15)',
                 border: 'none',
                 color: 'white',
                 cursor: 'pointer',
-                fontSize: '13px',
+                fontSize: '12px',
                 padding: '4px 8px',
-                opacity: 0.8,
-                transition: 'opacity 0.2s'
+                borderRadius: '2px'
               }}
-              onMouseOver={(e) => (e.currentTarget.style.opacity = '1')}
-              onMouseOut={(e) => (e.currentTarget.style.opacity = '0.8')}
               title="Clear chat history"
             >
-              🗑️
+              Clear
             </button>
             <button 
               onClick={toggleMinimize}
               style={{
-                background: 'none',
+                background: 'rgba(255,255,255,0.15)',
                 border: 'none',
                 color: 'white',
                 cursor: 'pointer',
-                fontSize: '14px',
+                fontSize: '12px',
                 padding: '4px 8px',
-                opacity: 0.8,
-                transition: 'opacity 0.2s'
+                borderRadius: '2px'
               }}
-              onMouseOver={(e) => (e.currentTarget.style.opacity = '1')}
-              onMouseOut={(e) => (e.currentTarget.style.opacity = '0.8')}
             >
-              {isMinimized ? '▲' : '▼'}
+              {isMinimized ? 'Expand' : 'Minimize'}
             </button>
           </div>
         </div>
@@ -356,17 +352,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         {/* Chat Messages */}
         <AnimatePresence>
           {!isMinimized && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
+            <div
               style={{
                 flex: 1,
                 overflowY: 'auto',
                 padding: '12px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '12px',
+                gap: '8px',
                 color: colors.text,
                 backgroundColor: colors.bg
               }}
@@ -387,14 +380,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                     style={{
                       backgroundColor: message.role === 'user' ? colors.userMessageBg : colors.assistantMessageBg,
                       color: message.role === 'user' ? 'white' : colors.text,
-                      padding: '10px 14px',
-                      borderRadius: '14px',
-                      backdropFilter: 'blur(8px)',
+                      padding: '8px 12px',
+                      borderRadius: '4px',
                       border: `1px solid ${message.role === 'user' ? 'transparent' : colors.border}`,
-                      boxShadow: message.role === 'user' ? 'none' : `0 1px 3px ${isDarkMode ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.1)'}`,
                       wordBreak: 'break-word',
                       fontSize: '13px',
-                      lineHeight: '1.5'
+                      lineHeight: '1.4'
                     }}
                   >
                     {message.role === 'user' ? (
@@ -405,8 +396,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                   </div>
                   <div
                     style={{
-                      fontSize: '11px',
-                      marginTop: '3px',
+                      fontSize: '10px',
+                      marginTop: '2px',
                       color: colors.textSecondary,
                       alignSelf: message.role === 'user' ? 'flex-end' : 'flex-start',
                       paddingLeft: message.role === 'user' ? '0' : '4px',
@@ -423,13 +414,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                     alignSelf: 'flex-start',
                     backgroundColor: colors.assistantMessageBg,
                     color: colors.text,
-                    padding: '10px 14px',
-                    borderRadius: '14px',
-                    backdropFilter: 'blur(8px)',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
                     border: `1px solid ${colors.border}`,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px',
+                    gap: '6px',
                     fontSize: '13px'
                   }}
                 >
@@ -442,77 +432,65 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                 </div>
               )}
               <div ref={messagesEndRef} />
-            </motion.div>
+            </div>
           )}
         </AnimatePresence>
 
         {/* Chat Input */}
         <AnimatePresence>
           {!isMinimized && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
+            <div
               style={{
                 borderTop: `1px solid ${colors.border}`,
-                padding: '12px',
+                padding: '8px',
                 display: 'flex',
-                alignItems: 'flex-end',
+                alignItems: 'center',
                 gap: '8px',
                 backgroundColor: colors.bg
               }}
             >
-              <textarea
+              <input
+                type="text"
                 ref={chatInputRef}
                 style={{
                   flex: 1,
-                  padding: '10px 12px',
-                  borderRadius: '12px',
+                  padding: '8px 10px',
+                  borderRadius: '2px',
                   border: `1px solid ${colors.inputBorder}`,
-                  resize: 'none',
-                  minHeight: '38px',
-                  maxHeight: '100px',
                   outline: 'none',
-                  fontFamily: 'inherit',
                   backgroundColor: colors.inputBg,
                   color: colors.text,
-                  fontSize: '13px',
-                  lineHeight: '1.5',
-                  transition: 'border 0.2s ease',
-                  boxShadow: `0 1px 2px ${isDarkMode ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.05)'}`,
+                  fontSize: '13px'
                 }}
                 placeholder="Type your message..."
                 value={input}
-                onChange={handleInputChange}
+                onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyPress}
-                rows={1}
               />
               <button
                 style={{
                   backgroundColor: colors.primary,
                   color: 'white',
                   border: 'none',
-                  borderRadius: '10px',
-                  padding: '0 14px',
-                  height: '38px',
-                  cursor: isLoading || !input.trim() ? 'not-allowed' : 'pointer',
+                  borderRadius: '2px',
+                  padding: '0 12px',
+                  height: '32px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontWeight: '500',
                   fontSize: '13px',
-                  transition: 'all 0.2s ease',
-                  opacity: isLoading || !input.trim() ? 0.7 : 1,
+                  opacity: isLoading || !input.trim() ? 0.5 : 1,
+                  cursor: isLoading || !input.trim() ? 'not-allowed' : 'pointer'
                 }}
                 onClick={sendMessage}
                 disabled={isLoading || !input.trim()}
               >
                 Send
               </button>
-            </motion.div>
+            </div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </div>
   );
 };

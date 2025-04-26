@@ -29,6 +29,7 @@ export interface ChatWindowProps extends ChatProps {
   initialY?: number;
   initialWidth?: number;
   initialHeight?: number;
+  positionClassName?: string;
 }
 
 export interface PlaceLink {
