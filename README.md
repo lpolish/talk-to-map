@@ -2,6 +2,8 @@
 
 EarthAI is an interactive satellite map application with an integrated AI chat interface. It allows users to explore locations around the world while having natural conversations with an AI assistant about the places they're viewing.
 
+![Screenshot from 2025-04-26 10-25-14](https://github.com/user-attachments/assets/16d8be39-5171-44ea-8d26-b211cf9163a1)
+
 ## 🌍 About the Project
 
 EarthAI combines interactive mapping technology with AI-powered chat to create an engaging exploration experience. The platform features:
