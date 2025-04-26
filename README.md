@@ -5,55 +5,84 @@
 - Node.js 18+ and npm
 - Docker and Docker Compose
 
-## Getting Started
+## Docker Setup
 
-1. Install dependencies:
+The application is containerized using Docker and Docker Compose. The setup includes:
+- Next.js application container
+- PostgreSQL database container
+
+### Using the Management Script
+
+We provide a `manage.sh` script to simplify development and deployment tasks. Make it executable first:
+
 ```bash
-npm install
+chmod +x manage.sh
 ```
 
-2. Start the PostgreSQL database:
+Available commands:
+```bash
+./manage.sh dev           # Start development environment
+./manage.sh build         # Build production containers
+./manage.sh start         # Start production environment
+./manage.sh stop          # Stop all containers
+./manage.sh restart       # Restart all containers
+./manage.sh logs          # View container logs
+./manage.sh clean         # Remove all containers and volumes
+./manage.sh help          # Show help message
+```
+
+### Manual Docker Commands
+
+If you prefer using Docker commands directly:
+
+1. Start the development environment:
 ```bash
 docker-compose up -d
 ```
 
-The PostgreSQL database will be available at:
+2. View logs:
+```bash
+docker-compose logs -f
+```
+
+3. Stop containers:
+```bash
+docker-compose down
+```
+
+4. Clean up (including volumes):
+```bash
+docker-compose down -v
+```
+
+## Database Configuration
+
+The PostgreSQL database is configured with:
 - Host: localhost
 - Port: 5432
 - Database: earthai_db
 - Username: earthai_user
 - Password: dev_password_123 (change this in production)
 
-To verify the database is running:
-```bash
-docker-compose ps
-```
-
-To view database logs:
-```bash
-docker-compose logs -f db
-```
-
-To stop the database:
-```bash
-docker-compose down
-```
-
-To stop the database and remove all data:
-```bash
-docker-compose down -v
-```
-
 ## Development
-
-Run the development server:
-```bash
-npm run dev
-```
 
 The application will be available at [http://localhost:3000](http://localhost:3000).
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Production Deployment
+
+For production deployment:
+
+1. Build the containers:
+```bash
+./manage.sh build
+```
+
+2. Start the production environment:
+```bash
+./manage.sh start
+```
 
 ## Learn More
 
